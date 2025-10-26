@@ -14,6 +14,8 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
 function UserRegistration() {
+
+  const [currentTab, setCurrentTab] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
@@ -50,6 +52,12 @@ function UserRegistration() {
     }
   };
   const handleSuccess = (credentialResponse:any) => {
+    if(currentTab == "register")
+      handleRegisterWithSocialLogin(credentialResponse);
+    else
+      handleLoginWithSocialLogin(credentialResponse);
+  };
+  const handleLoginWithSocialLogin = (credentialResponse:any) => {
     //jwtDecode
     const decoded:any = jwtDecode(credentialResponse.credential);
     const param:any = {};
@@ -69,6 +77,26 @@ function UserRegistration() {
     console.error("Login Failed");
     alert("Google Sign In was unsuccessful. Try again later");
   };
+const handleRegisterWithSocialLogin = (credentialResponse:any) => {
+        // jwtDecode
+    const decoded:any = jwtDecode(credentialResponse.credential);
+        const param:any = {};
+        param.firstName = decoded.given_name;
+        param.lastName = decoded.family_name;
+        param.email = decoded.email;
+        param.socialLogin = true;
+        param.uniqueIdentifier = decoded.sub;
+        authService.createUserFromSocialLogin(param)
+            .then(function (e:any) {
+            
+            if (e.status && e.status == 200)
+            {
+                localStorage.setItem('token', e.token);
+                navigate("/dashboard");
+            }
+        })
+    // You can store the user info or send to backend for auth
+    };
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     if (registerPassword !== confirmPassword) {
@@ -151,7 +179,7 @@ function UserRegistration() {
             handleSubmit()
         }
     }
-
+  
   return (
     <Card className="w-full max-w-md mx-auto shadow-lg border-0 bg-card">
       <CardHeader className="space-y-4 pb-6">
@@ -169,7 +197,7 @@ function UserRegistration() {
       </CardHeader>
       
       <CardContent className="space-y-6">
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs onValueChange={($event)=> {setCurrentTab($event)}} defaultValue={currentTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="login">Sign In</TabsTrigger>
             <TabsTrigger value="register">Sign Up</TabsTrigger>
