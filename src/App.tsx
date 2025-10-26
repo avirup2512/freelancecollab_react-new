@@ -7,12 +7,8 @@ function App() {
 
   return (
     <>
-      <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
-        {/* <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-secondary/20 flex items-center justify-center p-4">
-        <div className="w-full max-w-md"> */}
+      <GoogleOAuthProvider clientId="919886091004-mdne53v66e3dl718f835g3cn7aj8mb79.apps.googleusercontent.com">
           <AppRoute />
-        {/* </div>
-        </div> */}
       </GoogleOAuthProvider>
     </>
   )
