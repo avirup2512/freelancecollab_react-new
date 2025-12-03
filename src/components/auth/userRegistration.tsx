@@ -64,7 +64,7 @@ function UserRegistration() {
     param.email = decoded.email;
     param.uniqueIdentifier = decoded.sub;
     param.socialLogin = true;
-    authService.login(param).then(function (e:any) {
+    authService.createUserFromSocialLogin(param).then(function (e:any) {
       if (e.status && e.status == 200) {
         dispatch(setUser(e.data));
         localStorage.setItem("token", e.token);
