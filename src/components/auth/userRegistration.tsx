@@ -62,7 +62,7 @@ function UserRegistration() {
     const decoded:any = jwtDecode(credentialResponse.credential);
     const param:any = {};
     param.email = decoded.email;
-    param.uniqueIdentifier = decoded.sub;
+    param.uniqueIdentifier = credentialResponse.credential;
     param.socialLogin = true;
     authService.createUserFromSocialLogin(param).then(function (e:any) {
       if (e.status && e.status == 200) {
