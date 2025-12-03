@@ -3,7 +3,7 @@ const AuthService:any = (function () {
   let baseUrl = config.baseUrl;
   function auth() {}
   auth.prototype.createUser = async function (params:any) {
-    const res = await fetch(baseUrl + "auth/createUser", {
+    const res = await fetch(baseUrl + "auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -13,7 +13,7 @@ const AuthService:any = (function () {
     return res.json();
   };
   auth.prototype.createUserFromSocialLogin = async function (params:any) {
-    const res = await fetch(baseUrl + "auth/createUser", {
+    const res = await fetch(baseUrl + "auth/social/google", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -43,7 +43,7 @@ const AuthService:any = (function () {
     return res.json();
   };
   auth.prototype.resetPassword = async function (params:any) {
-    const res = await fetch(baseUrl + "auth/resetPasswordRequest", {
+    const res = await fetch(baseUrl + "auth/forgot-password", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +53,7 @@ const AuthService:any = (function () {
     return res.json();
   };
   auth.prototype.setNewPassword = async function (params:any) {
-    const res = await fetch(baseUrl + "auth/resetPassword", {
+    const res = await fetch(baseUrl + "auth/reset-password", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

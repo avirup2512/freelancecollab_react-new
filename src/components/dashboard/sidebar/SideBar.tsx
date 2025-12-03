@@ -1,4 +1,4 @@
-import { LayoutDashboard, FolderOpen, Kanban, User, Settings, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, FolderOpen, Kanban, User, Settings, ChevronRight, Users } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -15,9 +15,10 @@ interface SidebarComponentProps {
 }
 
 const sidebarItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'report', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'project', label: 'Project', icon: FolderOpen },
   { id: 'boards', label: 'Boards', icon: Kanban },
+  { id: 'team', label: 'Team', icon: Users },
   { id: 'profile', label: 'Profile', icon: User },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];

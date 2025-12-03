@@ -7,10 +7,10 @@ import Project from "./project/Project";
 import ListContainer from "./list/ListContainer";
 import CardDetails from "./card/CardDetails";
 import SearchResult from "./searchResult/SearchResult";
-import User from "./user/User";
+import UserProfile from "./user/User";
 import { SidebarInset, SidebarProvider } from "../ui/_sidebar";
-import CardDetailsContainer from "./card/CardDetailsContainer";
-
+import Report from "./report/Report";
+import TeamManagement from "./team/TeamManagement";
 function Dashboard() {
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState('boards');
@@ -32,10 +32,12 @@ function Dashboard() {
                   <Route path="/project" element={<Navigate to="../project/ACTIVE" />}></Route>
                   <Route path="project/:type" element={<Project />}></Route>
                   <Route path="board/:projectId/:type" element={<Board />}></Route>
-                  <Route path="user" element={<User></User>}></Route>
+                  <Route path="profile" element={<UserProfile></UserProfile>}></Route>
                   <Route path="list/:projectId/:boardId/:filterType" element={<ListContainer />}></Route>
                   <Route path="list/:projectId/:boardId/:listId/card/:cardId" element={<CardDetails />}></Route>
                   <Route path="search/:type/:searchText" element={<SearchResult />}></Route>
+                  <Route path="report" element={<Report />}></Route>
+                  <Route path="team" element={<TeamManagement/>}></Route>
                 </Routes>
               </main>
             </div>

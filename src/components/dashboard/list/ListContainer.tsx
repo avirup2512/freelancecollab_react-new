@@ -33,99 +33,13 @@ import ListContainerHeader from './ListContainerHeader';
 import { Tab } from '../../../interfaces/App';
 import CardService from '../../../services/auth/CardService';
 import type { Card } from '../card/CardItem';
-const initialData: Column[] = [
-  {
-    id: '1',
-    title: 'To Do',
-    tasks: [
-      {
-        id: '1',
-        title: 'Design new homepage layout',
-        description: 'Create wireframes and mockups for the new homepage design with improved user experience',
-        priority: 'high',
-        assignee: 'Sarah Chen',
-        dueDate: '2024-01-15',
-        tags: ['Design', 'Frontend', 'UI/UX']
-      },
-      {
-        id: '2',
-        title: 'Research competitor analysis',
-        description: 'Analyze top 5 competitors and their feature sets',
-        priority: 'medium',
-        assignee: 'Mike Johnson',
-        dueDate: '2024-01-20',
-        tags: ['Research', 'Analysis']
-      }
-    ]
-  },
-  {
-    id: '2',
-    title: 'In Progress',
-    tasks: [
-      {
-        id: '3',
-        title: 'Implement user authentication',
-        description: 'Set up secure login and registration system with JWT tokens',
-        priority: 'high',
-        assignee: 'Alex Rodriguez',
-        dueDate: '2024-01-18',
-        tags: ['Backend', 'Security', 'Authentication']
-      },
-      {
-        id: '4',
-        title: 'Write API documentation',
-        description: 'Document all REST API endpoints with examples',
-        priority: 'medium',
-        assignee: 'Emma Wilson',
-        tags: ['Documentation', 'API']
-      }
-    ]
-  },
-  {
-    id: '3',
-    title: 'Review',
-    tasks: [
-      {
-        id: '5',
-        title: 'Code review for payment integration',
-        description: 'Review and test the new Stripe payment integration',
-        priority: 'high',
-        assignee: 'David Kim',
-        dueDate: '2024-01-16',
-        tags: ['Review', 'Payment', 'Testing']
-      }
-    ]
-  },
-  {
-    id: '4',
-    title: 'Done',
-    tasks: [
-      {
-        id: '6',
-        title: 'Set up CI/CD pipeline',
-        description: 'Configure automated testing and deployment pipeline',
-        priority: 'medium',
-        assignee: 'Lisa Park',
-        tags: ['DevOps', 'Automation']
-      },
-      {
-        id: '7',
-        title: 'Database schema design',
-        description: 'Design and implement the initial database schema',
-        priority: 'high',
-        assignee: 'Tom Brown',
-        tags: ['Database', 'Backend']
-      }
-    ]
-  }
-];
 interface AddCardModalProps {
   isOpen:boolean
   listId?: number,
 }
 function ListContainer() {
   const navigate = useNavigate();
-  const [columns, setColumns] = useState<Column[]>(initialData);
+  const [columns, setColumns] = useState<Column[]>([]);
   const [showAddCard, setShowAddCard] = useState<AddCardModalProps>({isOpen:false});
   const [showAddColumn, setShowAddColumn] = useState(false);
   const [activeColumnId, setActiveColumnId] = useState<number>(NaN);
@@ -255,7 +169,13 @@ function ListContainer() {
       });
       if (list.status && list.status == 200) {
         console.log(list.data);
-        
+        const listCopy = polyfill.deepCopy(allList);
+        listCopy.push({
+          id: list.data.lastInsertListId,
+          name: columnData.title,
+          cards: [],
+        });
+        dispatch(setAllList(listCopy));
       }
     }
   };
@@ -610,7 +530,7 @@ function ListContainer() {
       
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 via-background to-slate-50/50">
         {/* Header */}
-        <ListContainerHeader/>
+      <ListContainerHeader/>
         <Tabs onValueChange={(value: any) => { tabSelection(value); }} defaultValue={activeTabKey} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value={Tab.ACTIVE}>
@@ -629,77 +549,77 @@ function ListContainer() {
               handleDragStart(e);
             }}
           >
-        {/* Board */}
-        <div className="flex-1 overflow-x-auto px-8 py-6">
-          <div className="flex gap-6 h-full pb-6 min-w-max">
-                <SortableContext
-              items={allList.map((l:any) => "LIST" + l.id)}
-              id={"LISTCONTAINER"}
-              strategy={horizontalListSortingStrategy}
-              >
-              {allList.map((column:any) => (
-                <ListItem
-                  key={column.id}
-                  column={column}
-                  onOpenCard = {handleOpenCard}
-                  onAddCard={handleAddCard}
-                  onEditCard={handleEditCard}
-                  onDeleteCard={handleDeleteCard}
-                  onEditColumn={handleEditColumn}
-                  onDeleteColumn={handleDeleteColumn}
-                  onMoveCard={handleMoveCard}
-                  onDuplicateCard={handleDuplicateCard}
-                  onDuplicateColumn={handleDuplicateColumn}
-                  onMoveColumn={handleMoveColumn}
-                  onToggleCollapse={handleToggleCollapse}
-                  onArchiveColumn={handleArchiveColumn}
-                  onChangePriority={handleChangePriority}
-                  onMoveCardInColumn={handleMoveCardBetweenColumns}
-                  isListDragging={isListDragging}
-                />
-              ))}
-                </SortableContext>
-                <DragOverlay>
-                  {activeId && 
+          {/* Board */}
+          <div className="flex-1 overflow-x-auto px-8 py-6">
+            <div className="flex gap-6 h-full pb-6 min-w-max">
+                  <SortableContext
+                items={allList.map((l:any) => "LIST" + l.id)}
+                id={"LISTCONTAINER"}
+                strategy={horizontalListSortingStrategy}
+                >
+                {allList.map((column:any) => (
                   <ListItem
-                  key={allList[isList(activeId)].id}
-                  column={allList[isList(activeId)]}
-                  onOpenCard = {handleOpenCard}
-                  onAddCard={handleAddCard}
-                  onEditCard={handleEditCard}
-                  onDeleteCard={handleDeleteCard}
-                  onEditColumn={handleEditColumn}
-                  onDeleteColumn={handleDeleteColumn}
-                  onMoveCard={handleMoveCard}
-                  onDuplicateCard={handleDuplicateCard}
-                  onDuplicateColumn={handleDuplicateColumn}
-                  onMoveColumn={handleMoveColumn}
-                  onToggleCollapse={handleToggleCollapse}
-                  onArchiveColumn={handleArchiveColumn}
-                  onChangePriority={handleChangePriority}
-                  onMoveCardInColumn={handleMoveCardBetweenColumns}
-                  isListDragging={isListDragging}
-                />}
-                
-                </DragOverlay>
-              {/* Add Column Button */}
-              <div className="flex-shrink-0 w-80">
-              <Button
-                variant="outline"
-                onClick={handleAddColumn}
-                className="w-full h-20 border-dashed border-2 border-border/40 hover:border-blue-300 hover:bg-blue-50/50 transition-all duration-300 rounded-xl group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted group-hover:bg-blue-100 transition-colors">
-                    <Plus className="h-4 w-4 group-hover:text-blue-600" />
+                    key={column.id}
+                    column={column}
+                    onOpenCard = {handleOpenCard}
+                    onAddCard={handleAddCard}
+                    onEditCard={handleEditCard}
+                    onDeleteCard={handleDeleteCard}
+                    onEditColumn={handleEditColumn}
+                    onDeleteColumn={handleDeleteColumn}
+                    onMoveCard={handleMoveCard}
+                    onDuplicateCard={handleDuplicateCard}
+                    onDuplicateColumn={handleDuplicateColumn}
+                    onMoveColumn={handleMoveColumn}
+                    onToggleCollapse={handleToggleCollapse}
+                    onArchiveColumn={handleArchiveColumn}
+                    onChangePriority={handleChangePriority}
+                    onMoveCardInColumn={handleMoveCardBetweenColumns}
+                    isListDragging={isListDragging}
+                  />
+                ))}
+                  </SortableContext>
+                  <DragOverlay>
+                    {activeId && 
+                    <ListItem
+                    key={allList[isList(activeId)].id}
+                    column={allList[isList(activeId)]}
+                    onOpenCard = {handleOpenCard}
+                    onAddCard={handleAddCard}
+                    onEditCard={handleEditCard}
+                    onDeleteCard={handleDeleteCard}
+                    onEditColumn={handleEditColumn}
+                    onDeleteColumn={handleDeleteColumn}
+                    onMoveCard={handleMoveCard}
+                    onDuplicateCard={handleDuplicateCard}
+                    onDuplicateColumn={handleDuplicateColumn}
+                    onMoveColumn={handleMoveColumn}
+                    onToggleCollapse={handleToggleCollapse}
+                    onArchiveColumn={handleArchiveColumn}
+                    onChangePriority={handleChangePriority}
+                    onMoveCardInColumn={handleMoveCardBetweenColumns}
+                    isListDragging={isListDragging}
+                  />}
+                  
+                  </DragOverlay>
+                {/* Add Column Button */}
+                <div className="flex-shrink-0 w-80">
+                <Button
+                  variant="outline"
+                  onClick={handleAddColumn}
+                  className="w-full h-20 border-dashed border-2 border-border/40 hover:border-blue-300 hover:bg-blue-50/50 transition-all duration-300 rounded-xl group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted group-hover:bg-blue-100 transition-colors">
+                      <Plus className="h-4 w-4 group-hover:text-blue-600" />
+                    </div>
+                    <span className="text-sm font-medium">Add another column</span>
                   </div>
-                  <span className="text-sm font-medium">Add another column</span>
+                </Button>
                 </div>
-              </Button>
-              </div>
-              </div>
-            </div>
-            </DndContext>
+                </div>
+          </div>
+        </DndContext>
         {/* Dialogs */}
         <AddCardDialog
           open={showAddCard.isOpen}
@@ -708,23 +628,18 @@ function ListContainer() {
           onSave={handleSaveCard}
           editingTask={editingTask}
         />
-        
         <AddListDialog
           open={showAddColumn}
           onOpenChange={setShowAddColumn}
           onSave={handleSaveColumn}
           editingColumn={editingColumn}
         />
-          
         </TabsContent>
         <TabsContent value={Tab.ARCHIVE} className="space-y-4">
          <h3>Nothing</h3>
         </TabsContent>
       </Tabs>
       </div>
-    // <DndProvider backend={HTML5Backend}>
-  
-    // </DndProvider>
   );
 }
 export default ListContainer;

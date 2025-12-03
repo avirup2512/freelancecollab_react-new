@@ -20,7 +20,7 @@ function ResetPassword() {
   const [passwordLength, setPasswordLength] = useState(0);
   const [passwordSpecialCharacter, setPasswordSpecialCharacter] = useState(0);
     const [passwordUpperCase, setPasswordUpperCase] = useState(0);
-    const token: any = useParams();
+    const {token,userId}: any = useParams();
     const navigate = useNavigate();
     const authService = new AuthService();
     const hasSpecialChar = (str:string)=> {
@@ -63,7 +63,7 @@ function ResetPassword() {
       const handleSubmit = (event:any) => {
     event.preventDefault();
     authService
-      .setNewPassword({ token: token.token, password:registerPassword })
+      .setNewPassword({ token: token, uid:userId, newPassword:registerPassword })
       .then(function (e:any) {
         if (e.status && e.status == 200) {
           navigate("/auth");

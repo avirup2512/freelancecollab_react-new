@@ -25,7 +25,7 @@ function Auth() {
             element={<ResetPasswordEmailInput />}
           ></Route>
           <Route
-            path="forgotPassword/:token"
+            path="forgotPassword/:token/:userId"
             element={<ResetPassword />}
           ></Route>
         </Routes>

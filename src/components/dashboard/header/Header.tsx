@@ -12,6 +12,12 @@ import {
 } from '../../ui/_dropdown-menu';
 
 export function Header() {
+  const LogOut = () => {
+    return () => {
+      localStorage.removeItem('token');
+      window.location.href = '/auth';
+    };
+  };
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -62,7 +68,7 @@ export function Header() {
             <DropdownMenuContent align="end">
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={LogOut()}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
