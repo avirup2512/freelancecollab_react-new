@@ -76,13 +76,13 @@ function Project() {
     }
   }
   const archiveItem = async function (type:string,ids: number[]) {
-    const archivedProject = await projectService.archiveProject({ projectId: ids, archive: 1 });
+    const archivedProject = await projectService.archiveProject({ projectIds: ids, archive: 1 });
     if (archivedProject.status && archivedProject.status == 200) {
       onPageChange(type,paginationState)
     }
   }
   const activeItem = async function (type:string,ids: number[]) {
-    const archivedProject = await projectService.archiveProject({ projectId: ids, archive: 0 });
+    const archivedProject = await projectService.archiveProject({ projectIds: ids, archive: 0 });
     if (archivedProject.status && archivedProject.status == 200) {
       onPageChange(type, paginationState);
     }

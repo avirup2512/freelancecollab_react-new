@@ -179,6 +179,9 @@ const handleRegisterWithSocialLogin = (credentialResponse:any) => {
             handleSubmit()
         }
     }
+    const previousToNames = () => {
+        setPasswordSetBool(false);
+    }
   
   return (
     <Card className="w-full max-w-md mx-auto shadow-lg border-0 bg-card">
@@ -412,9 +415,14 @@ const handleRegisterWithSocialLogin = (credentialResponse:any) => {
                 }
                 {
                     passwordSetBool &&
+                    <>
+                      <Button onClick={previousToNames} className='w-full' type="submit">
+                        Previous Set names
+                      </Button>
                     <Button type="submit" className="w-full">
                       Create Account
                     </Button>
+                    </>
                 }
               
             </form>

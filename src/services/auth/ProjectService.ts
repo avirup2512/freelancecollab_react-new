@@ -8,7 +8,8 @@ let ProjectService:any = (function ()
     }
     ProjectService.prototype.getAllProject = async function (token:any,isActive:number,itemLimit:any,offset:any)
     {
-        const res = await fetch(baseUrl+'project/getAllProject/'+isActive+'/'+itemLimit+'/'+offset+'',{
+        const activeText = !isActive?"active":"archive";
+        const res = await fetch(baseUrl+'project/'+activeText+'/'+itemLimit+'/'+offset+'',{
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -103,7 +104,7 @@ let ProjectService:any = (function ()
     ProjectService.prototype.archiveProject = async function (params:any) {
     console.log(params);
 
-    const res = await fetch(baseUrl + "project/archiveProject", {
+    const res = await fetch(baseUrl + "project/archive", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
