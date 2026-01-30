@@ -19,7 +19,7 @@ let ProjectService:any = (function ()
     }
     ProjectService.prototype.createProject = async function (params:any)
     {
-        const res = await fetch(baseUrl+'project/create',{
+        const res = await fetch(baseUrl+'project',{
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ let ProjectService:any = (function ()
     }
     ProjectService.prototype.editProject = async function (params:any)
     {
-        const res = await fetch(baseUrl+'project/edit',{
+        const res = await fetch(baseUrl+'project/'+params.projectId,{
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
