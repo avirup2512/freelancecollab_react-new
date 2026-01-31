@@ -76,13 +76,13 @@ function Project() {
     }
   }
   const archiveItem = async function (type:string,ids: number[]) {
-    const archivedProject = await projectService.archiveProject({ projectIds: ids, archive: 1 });
+    const archivedProject = await projectService.archiveProject({ projectIds: [ids], archive: 1 });
     if (archivedProject.status && archivedProject.status == 200) {
       onPageChange(type,paginationState)
     }
   }
   const activeItem = async function (type:string,ids: number[]) {
-    const archivedProject = await projectService.archiveProject({ projectIds: ids, archive: 0 });
+    const archivedProject = await projectService.archiveProject({ projectIds: [ids], archive: 0 });
     if (archivedProject.status && archivedProject.status == 200) {
       onPageChange(type, paginationState);
     }
@@ -199,8 +199,6 @@ function Project() {
         <div>
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
             <span>Project</span>
-            <span>/</span>
-            <span>Board</span>
           </div>
           <h1 className="text-2xl font-semibold text-gray-900">Project</h1>
           <p className="text-sm text-gray-500 mt-1">

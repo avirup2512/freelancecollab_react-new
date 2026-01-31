@@ -88,7 +88,7 @@ export function AddProjectModal({ open, isEdit, project, type, onOpenChange, onA
     }
     if (isEdit && project)
     {
-      const user = project?.user.map((e: any) => { return { ...e, role: e.role_id } });
+      const user = project?.user ? project?.user.map((e: any) => { return { ...e, role: e.role_id } }): [];
       existingFormData.id = project?.id;
       existingFormData.name = (project?.name || "");
       existingFormData.description = (project?.description || "");

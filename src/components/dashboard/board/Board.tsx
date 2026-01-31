@@ -209,7 +209,7 @@ function Board() {
             <span>/</span>
             <span>Board</span>
           </div>
-          <h1 className="text-2xl font-semibold text-gray-900">Project</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Board</h1>
           <p className="text-sm text-gray-500 mt-1">
             Showing {startIndex + 1}-{Math.min(endIndex, boards.length)} of {boards.length} projects
           </p>

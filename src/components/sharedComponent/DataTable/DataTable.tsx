@@ -137,7 +137,9 @@ function DataTable({dataList,columnHeader,totalItem,action, type}:{dataList:any,
         onClearSelection={action.clearAllSelection}
       />
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <Table>
+          {
+            editedDataList.length > 0 &&
+            <Table>
           <TableHeader>
             <TableRow key={"item.name"} className="bg-gray-50">
             {
@@ -267,6 +269,7 @@ function DataTable({dataList,columnHeader,totalItem,action, type}:{dataList:any,
             ))}
           </TableBody>
           </Table>
+          }
           <DeleteConfirmationModal
             isOpen={deleteModal.isOpen}
             onClose={() => setDeleteModal({ isOpen: false, id: null, name: '' })}
@@ -287,7 +290,16 @@ function DataTable({dataList,columnHeader,totalItem,action, type}:{dataList:any,
             itemName={archiveModal.name}
           />
           </div>
-        <PaginationComponent totalItem={totalItem} onPageChange={onPageChange}></PaginationComponent>
+          {
+            editedDataList.length == 0 &&
+            <div className="text-center p-6 text-gray-500">
+              No data found.
+            </div>
+          }
+          {
+            editedDataList.length > 0 &&
+            <PaginationComponent totalItem={totalItem} onPageChange={onPageChange}></PaginationComponent>
+          }
         <UserAddModal
             open={userAddModal.isOpen}
             onOpenChange={(open) => {
