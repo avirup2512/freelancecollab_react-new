@@ -59,8 +59,8 @@ function Board() {
     const isActive = ((type == Tab.ACTIVE) ? 0 : 1);
     const board = await boardService.getAllBoards(localStorage.getItem("token"),projectId, isActive, itemsPerPage, currentOffset);
     if (board.status && board.status == 200) {
-      setBoards(board.data);
-      setTotalItem(board.totalCount);
+      setBoards(board.boards);
+      setTotalItem(board.count);
     }
   };
 

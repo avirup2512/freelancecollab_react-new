@@ -6,7 +6,7 @@ export interface Board{
     id:number,
     name: string,
     description: string,
-    user: User[],
+    users: User[],
     list:List[],
     isActive: boolean,
     isArchived: boolean,
@@ -15,7 +15,7 @@ export interface Board{
     totalUsedMemory:number
     status?: string,
     isSelect?: boolean,
-    tag?:Array<any>
+    tags?:Array<any>
 }
 export interface BoardAddUser {
   user_id: number,

@@ -62,6 +62,12 @@ function ListItem({
     console.log(isListDragging);
     
   },[isListDragging])
+  useEffect(() => {
+    // console.log('Column updated:', column);
+    if(column.cards && typeof column.cards !== 'object') {
+      column.cards = JSON.parse(column.cards as unknown as string);
+    }
+  }, [column]);
   const dragging = useSelector((e:any) => e.list.dragging);
   const highPriorityCount = column.cards.filter(card => card.priority === 'high').length;
   const overdueTasks = column.cards.filter(card => 

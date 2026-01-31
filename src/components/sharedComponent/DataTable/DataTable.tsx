@@ -79,7 +79,7 @@ function DataTable({dataList,columnHeader,totalItem,action, type}:{dataList:any,
           default: return "th";
         }
       })(day);
-      const month = Months[date.getMonth()].short;
+      const month = Months[date.getMonth()]?.short;
       const year = date.getFullYear();
       // Time in 12-hour format
       let hours = date.getHours();
@@ -300,7 +300,7 @@ function DataTable({dataList,columnHeader,totalItem,action, type}:{dataList:any,
             editedDataList.length > 0 &&
             <PaginationComponent totalItem={totalItem} onPageChange={onPageChange}></PaginationComponent>
           }
-        <UserAddModal
+            <UserAddModal
             open={userAddModal.isOpen}
             onOpenChange={(open) => {
               if (!open) {

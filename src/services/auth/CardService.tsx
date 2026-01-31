@@ -16,7 +16,7 @@ let CardService:any = (function () {
     return res.json();
   };
   CardService.prototype.createCard = async function (params:any) {
-    const res = await fetch(baseUrl + "card/create", {
+    const res = await fetch(baseUrl + "card", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

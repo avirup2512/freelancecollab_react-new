@@ -16,7 +16,7 @@ let ListService:any = (function () {
     return res.json();
   };
   ListService.prototype.createList = async function (params:any) {
-    const res = await fetch(baseUrl + "list/create", {
+    const res = await fetch(baseUrl + "list", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

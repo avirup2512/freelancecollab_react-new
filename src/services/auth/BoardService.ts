@@ -6,9 +6,8 @@ let BoardService:any = (function () {
     const res = await fetch(
       baseUrl +
         "board/getAllBoard/" +
+        (!isActive ? "active" : "archive") + "/" +
         projectId +
-        "/" +
-        isActive +
         "/" +
         itemLimit +
         "/" +
@@ -25,7 +24,7 @@ let BoardService:any = (function () {
     return res.json();
   };
   BoardService.prototype.createBoard = async function (params:any) {
-    const res = await fetch(baseUrl + "board/create", {
+    const res = await fetch(baseUrl + "board", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

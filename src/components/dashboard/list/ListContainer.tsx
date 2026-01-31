@@ -83,7 +83,7 @@ function ListContainer() {
         cardArr.push({
           complete: 0,
           description: null,
-          id: card.data.lastInsertCardId,
+          id: card.lastInsertCardId,
           name: cardData.name,
           user: [],
           tags: [],
@@ -276,13 +276,6 @@ function ListContainer() {
     handleMoveCard(taskId, targetColumnId);
     toast.success(`Card moved ${direction}`);
   };
-
-
-
-
-
-
-
   const dispatch = useDispatch();
   const { projectId,boardId, filterType } = useParams();
   const [activeTabKey, setActiveTabKey] = useState<Tab>(filterType);
@@ -305,7 +298,7 @@ function ListContainer() {
     const getList = async (isArchive:number, filterType:Tab) => {    
     const list = await listService.getAllList(boardId, isArchive, filterType);
     if (list.status && list.status == 200) {
-      const result = Object.entries(list.data).map(([_, value]) => value);
+      const result = list.data;
 
       result.sort((a:any, b:any) => {
         return a.position > b.position ? 1 : -1;
@@ -331,18 +324,26 @@ function ListContainer() {
     e.label = e.name;
     e.value = e.id;
     const item = JSON.parse(JSON.stringify(e));
+    if(item.cards && typeof item.cards !== 'object') {
+      item.cards = JSON.parse(item.cards as unknown as string);
+    };
+    console.log(item.cards);
+    
     if (item.hasOwnProperty("cards")) {
-      let cardArray = Object.entries(item?.cards).map((e:any) => {
-        let users = Object.entries(e[1].users).map((u) => {
+      let cardArray = item?.cards?.map((e:any) => {
+        console.log(e);
+        
+        let users = e.users.map((u:any) => {
           return u[1];
         });
-        e[1].users = users;
-        let tags = Object.entries(e[1].tags).map((u) => {
+        e.users = users;
+        let tags =e.tags.map((u) => {
           return u[1];
         });
-        e[1].tags = tags;
-        return e[1];
+        e.tags = tags;
+        return e;
       });
+      if (cardArray == null) cardArray = [];
       cardArray.sort((a, b) => {
         return a.position > b.position ? 1 : -1;
       });

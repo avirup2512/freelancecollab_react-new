@@ -32,9 +32,9 @@ export function AddBoardModal({ open, isEdit, board, type, onOpenChange, onAddBo
   const projectService = new ProjectService();
   useEffect(() => {
     console.log(board);
-    if (board?.tag)
+    if (board?.tags)
     {
-      setTags(Object.entries(board?.tag).map((e) => {return {id:e[1].tagId,color:e[1].tagColor,name:e[1].tagName}}));
+      setTags(Object.entries(board?.tags).map((e) => {return {id:e[1].tagId,color:e[1].tagColor,name:e[1].tagName}}));
     }
   },[board])
   const [formData, setFormData] = useState<NewBoardData>({
@@ -43,7 +43,7 @@ export function AddBoardModal({ open, isEdit, board, type, onOpenChange, onAddBo
     status: 'active',
     users: [],
   });
-  const [tags, setTags] = useState<TagType[]>(board?.tag || []);
+  const [tags, setTags] = useState<TagType[]>(board?.tags || []);
   const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
   const [userSearchTerm, setUserSearchTerm] = useState('');
   const [showUserDropdown, setShowUserDropdown] = useState(false);
@@ -83,7 +83,14 @@ export function AddBoardModal({ open, isEdit, board, type, onOpenChange, onAddBo
     }
     if (isEdit && board)
     {
-      const user = board?.user.map((e: any) => { return { ...e, role: e.role_id } });
+      console.log(board);
+      if(board?.users && typeof board?.users !== 'object') {
+        board.users = JSON.parse(board.users as unknown as string);
+      }
+      if(board?.tags && typeof board?.tags !== 'object') {
+        board.tags = JSON.parse(board.tags as unknown as string);
+      }
+      const user = board?.users.map((e: any) => { return { ...e, role: e.role_id } });
       existingFormData.id = board?.id;
       existingFormData.name = (board?.name || "");
       existingFormData.description = (board?.description || "");
