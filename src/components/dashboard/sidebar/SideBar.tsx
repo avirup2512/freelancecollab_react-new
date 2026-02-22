@@ -1,4 +1,4 @@
-import { LayoutDashboard, FolderOpen, Kanban, User, Settings, ChevronRight, Users } from 'lucide-react';
+import { LayoutDashboard, FolderOpen, Kanban, User, Settings, ChevronRight, Users, TrainTrackIcon, FormInputIcon } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -21,6 +21,8 @@ const sidebarItems = [
   { id: 'team', label: 'Team', icon: Users },
   { id: 'profile', label: 'Profile', icon: User },
   { id: 'settings', label: 'Settings', icon: Settings },
+  { id: 'taskTracker', label: 'Task Tracker', icon: TrainTrackIcon },
+   { id: 'taskEntry', label: 'Task Entry', icon: FormInputIcon },
 ];
 
 export function SidebarComponent({ activeItem, onItemClick }: SidebarComponentProps) {
