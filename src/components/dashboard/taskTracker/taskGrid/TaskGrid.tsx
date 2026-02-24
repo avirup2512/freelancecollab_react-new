@@ -220,7 +220,7 @@ export function TaskGrid() {
                             className={cellClasses}
                             title={`${dayData.date.toLocaleDateString()}`}
                           >
-                            {dayData.day}
+                            {new Date(dayData.dateString).getDate()}
                           </button>
                           </TooltipTrigger>
                           <TooltipContent side="left">
