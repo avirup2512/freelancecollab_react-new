@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Button } from '../../ui/_button';
 import { Badge } from '../../ui/_badge';
 import { Plus } from 'lucide-react';
@@ -284,6 +284,9 @@ function ListContainer() {
   const [isListDragging, setIsListDragging] = useState<any>();
   const [draggingCard, setDraggingCard] = useState({});
   const [activeId, setActiveId] = useState(null);
+  const [overListId, setOverListId] = useState<number | null>(null);
+  const dragOverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastOverListIdRef = useRef<number | null>(null);
   const sensor = useSensors(useSensor(MouseSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }));
   useEffect(() => {
     if(filterType)
@@ -295,6 +298,15 @@ function ListContainer() {
       }
     }
     }, [filterType]);
+    
+    // Cleanup drag over timeout when activeId changes
+    useEffect(() => {
+      return () => {
+        if (dragOverTimeoutRef.current) {
+          clearTimeout(dragOverTimeoutRef.current);
+        }
+      };
+    }, [activeId]);
     const getList = async (isArchive:number, filterType:Tab) => {    
     const list = await listService.getAllList(boardId, isArchive, filterType);
     if (list.status && list.status == 200) {
@@ -355,7 +367,8 @@ function ListContainer() {
     return item;
   };
   const isList = (id:any) => {
-    return allList.findIndex((l:any) => l.id == id.match(/\d+/)[0]);
+    const idNum = typeof id === 'number' ? id : Number(id.match(/\d+/)?.[0] || 0);
+    return allList.findIndex((l:any) => l.id == idNum);
   };
     const findContainer = (id:number, type:any) => {    
     if(type == "LIST")
@@ -370,59 +383,143 @@ function ListContainer() {
     return listId;
   };
   const handleDragStart = (active: any) => {    
-      console.log("JH");
-      
     if (active.active.data.current.sortable.containerId == "LISTCONTAINER") {
       setIsListDragging(true);
-      setActiveId(active.active.id.match(/\d+/)[0]);
+      setActiveId(Number(active.active.id.match(/\d+/)?.[0] || 0));
       return
     } else {
-      const elem =
-        active.activatorEvent.srcElement.offsetParent.querySelector(
-          ".cardWrapper"
-        );
+      // Card is being dragged
+      const cardId = Number(active.active.id.match(/\d+/)?.[0] || 0);
       setIsListDragging(false);
-      setActiveId(elem.getAttribute("data-list-id"));
-      const card = allList
-        .find((l:any) => l.id == elem.getAttribute("data-list-id"))
-        .cards.find((c:any) => c.id == active.active.id.match(/\d+/)[0]);
-      setDraggingCard(card);
+      
+      // Find which list this card belongs to by searching through allList
+      let listId: any = null;
+      let foundCard: any = null;
+      
+      for (const list of allList) {
+        const card = list.cards.find((c: any) => c.id == cardId);
+        if (card) {
+          listId = list.id;
+          foundCard = card;
+          break;
+        }
+      }
+      
+      if (listId !== null && foundCard) {
+        setActiveId(listId);
+        setDraggingCard(foundCard);
+      }
     }
-    // setCurrentDraggingHtml(active.activatorEvent.srcElement.parentElement);
   };
-  const handleDragEnd = async ({ active, over }:{active:any,over:any}) => {
-    setActiveId(null); // reset
+  const handleDragOver = ({ active, over }: { active: any; over: any }) => {
     if (!over) return;
-    const activeId = active.id.match(/\d+/)[0];
-    const overId = over.id.match(/\d+/)[0];
+    
+    const activeId = Number(active.id.match(/\d+/)?.[0] || 0);
+    const overId = Number(over.id.match(/\d+/)?.[0] || 0);
     const isListOrCardActive = active.id.match(/[A-Z]/g).join("");
     const isListOrCardOver = over.id.match(/[A-Z]/g).join("");
+
+    // Only handle list dragging
+    if (isListOrCardActive === "LIST" && isListOrCardOver === "LIST") {
+      const overListIdNum = Number(overId);
+      
+      // Only update if it's different from the active list and different from the last recorded over list
+      if (overListIdNum !== Number(activeId) && overListIdNum !== lastOverListIdRef.current) {
+        // Clear existing timeout
+        if (dragOverTimeoutRef.current) {
+          clearTimeout(dragOverTimeoutRef.current);
+        }
+        
+        // Update after a small delay to debounce rapid changes
+        dragOverTimeoutRef.current = setTimeout(() => {
+          lastOverListIdRef.current = overListIdNum;
+          setOverListId(overListIdNum);
+        }, 50); // 50ms debounce delay
+      }
+    }
+  };
+  const handleDragEnd = async ({ active, over }:{active:any,over:any}) => {
+    // Clear timeout and reset refs
+    if (dragOverTimeoutRef.current) {
+      clearTimeout(dragOverTimeoutRef.current);
+    }
+    lastOverListIdRef.current = null;
+    
+    setActiveId(null); // reset
+    setOverListId(null); // reset preview
+    if (!over) return;
+    
+    // Debug logging to see what we're extracting
+    console.log("Raw active.id:", active.id);
+    console.log("Raw over.id:", over.id);
+    
+    const activeId = Number(active.id.match(/\d+/)?.[0] || 0);
+    const overId = Number(over.id.match(/\d+/)?.[0] || 0);
+    const isListOrCardActive = active.id.match(/[A-Z]/g).join("");
+    const isListOrCardOver = over.id.match(/[A-Z]/g).join("");
+    
+    console.log("Extracted activeId:", activeId, "overId:", overId);
+    console.log("Active type:", isListOrCardActive, "Over type:", isListOrCardOver);
+    
     const activeContainer = findContainer(activeId, isListOrCardActive);
     const overContainer = findContainer(overId, isListOrCardOver);
-
+    console.log(activeContainer, activeId);
+    console.log(overContainer, overId);
+    console.log("Are they different?", activeId !== overId);
+    
     // ✅ CASE 1: Moving entire lists
     if (activeContainer == activeId && overContainer == overId) {
+      console.log("CASE 1: List to List detected");
       if (activeId !== overId) {
+        console.log("activeId !== overId is TRUE, proceeding with swap");
+        console.log(activeId, overId);
         const listCopy = polyfill.deepCopy(allList);
 
         const oldIndex = listCopy.findIndex((l:any) => l.id == activeId);
-
         const newIndex = listCopy.findIndex((l:any) => l.id == overId);
-        listCopy[oldIndex].position = newIndex + 1;
-        listCopy[newIndex].position = oldIndex + 1;
+
+        // Reorder the lists array using arrayMove
+        const reorderedLists = arrayMove(listCopy, oldIndex, newIndex);
+
+        // Update positions sequentially after reordering
+        const listsWithUpdatedPositions = reorderedLists.map((list: any, index: number) => ({
+          ...list,
+          position: index + 1
+        }));
+
+        // Update UI immediately for smooth feedback
+        dispatch(setAllList(listsWithUpdatedPositions));
+
+        // Send updated lists to backend
         const list = await listService.updateListPosition({
           boardId,
-          lists: [listCopy[oldIndex], listCopy[newIndex]],
+          lists: listsWithUpdatedPositions,
         });
+
         if (list.status && list.status == 200) {
-          listCopy.sort((a:any, b:any) => {
+          // Backend confirmed - keep the new order
+          listsWithUpdatedPositions.sort((a:any, b:any) => {
             return a.position > b.position ? 1 : -1;
           });
-          dispatch(setAllList(listCopy));
+          dispatch(setAllList(listsWithUpdatedPositions));
+        } else {
+          // Backend failed - revert to original order
+          const originalSorted = [...allList].sort((a:any, b:any) => {
+            return a.position > b.position ? 1 : -1;
+          });
+          dispatch(setAllList(originalSorted));
         }
+      } else {
+        console.log("❌ CASE 1 FAILED: Not both list types or activeId === overId");
+        console.log(`isListOrCardActive: "${isListOrCardActive}", isListOrCardOver: "${isListOrCardOver}"`);
+        console.log(`activeId === overId: ${activeId === overId}`);
       }
       return;
     }
+    
+    console.log("❌ CASE 1 NOT ENTERED: activeContainer !== activeId OR overContainer !== overId");
+    console.log(`activeContainer: ${activeContainer}, activeId: ${activeId}`);
+    console.log(`overContainer: ${overContainer}, overId: ${overId}`);
 
     // ✅ CASE 2: Moving cards
     if (activeContainer && overContainer) {
@@ -523,6 +620,22 @@ function ListContainer() {
     }
     setIsListDragging(null);
   };
+
+  // Compute the displayed list order (with preview reordering during drag)
+  const displayedLists = (() => {
+    if (isListDragging && activeId && overListId && activeId !== overListId) {
+      const listsCopy = [...allList];
+      const activeIndex = listsCopy.findIndex((l: any) => l.id == activeId);
+      const overIndex = listsCopy.findIndex((l: any) => l.id == overListId);
+      
+      if (activeIndex !== -1 && overIndex !== -1) {
+        // Reorder using arrayMove to preview the new position
+        return arrayMove(listsCopy, activeIndex, overIndex);
+      }
+    }
+    return allList;
+  })();
+
   const tabSelection = (value: any) => {
     // dispatch(setPaginationState({itemsPerPage:5,currentOffset:0}))
     //   navigate("../board/"+projectId+"/"+value);
@@ -546,6 +659,7 @@ function ListContainer() {
             sensors={sensor}
             collisionDetection={closestCorners}
             onDragEnd={handleDragEnd}
+            onDragOver={handleDragOver}
             onDragStart={(e) => {
               handleDragStart(e);
             }}
@@ -554,11 +668,11 @@ function ListContainer() {
           <div className="flex-1 overflow-x-auto px-8 py-6">
             <div className="flex gap-6 h-full pb-6 min-w-max">
                   <SortableContext
-                items={allList.map((l:any) => "LIST" + l.id)}
+                items={displayedLists.map((l:any) => "LIST" + l.id)}
                 id={"LISTCONTAINER"}
                 strategy={horizontalListSortingStrategy}
                 >
-                {allList.map((column:any) => (
+                {displayedLists.map((column:any) => (
                   <ListItem
                     key={column.id}
                     column={column}
@@ -581,7 +695,7 @@ function ListContainer() {
                 ))}
                   </SortableContext>
                   <DragOverlay>
-                    {activeId && 
+                    {activeId && isListDragging && 
                     <ListItem
                     key={allList[isList(activeId)].id}
                     column={allList[isList(activeId)]}
@@ -601,7 +715,20 @@ function ListContainer() {
                     onMoveCardInColumn={handleMoveCardBetweenColumns}
                     isListDragging={isListDragging}
                   />}
-                  
+                    {activeId && !isListDragging && draggingCard && 
+                      <div className="p-4 pb-3 space-y-2 bg-card border border-border/60 rounded-sm shadow-2xl max-w-xs opacity-95">
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <h4 className="font-medium leading-snug line-clamp-2">
+                            {draggingCard?.name}
+                          </h4>
+                          {draggingCard?.description && (
+                            <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
+                              {draggingCard?.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    }
                   </DragOverlay>
                 {/* Add Column Button */}
                 <div className="flex-shrink-0 w-80">

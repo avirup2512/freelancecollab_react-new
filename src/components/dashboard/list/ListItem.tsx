@@ -6,6 +6,7 @@ import CardItem,{ type Card as CardType } from '../card/CardItem';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '../../ui/_dropdown-menu';
 import ConditionalSortableWrapper from '../../sharedComponent/ConditionalSortableWrapper';
 import SortableWrapper from '../../sharedComponent/SortableWrapper';
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 
@@ -356,25 +357,36 @@ function ListItem({
         </CardHeader>
         {!column.collapsed && (
           <CardContent className="pt-0">
-            <div
-              // ref={drop}
-              className={`space-y-3 min-h-[240px] transition-all duration-300 rounded-lg ${
-                isOver ? 'bg-blue-50/50 border-2 border-dashed border-blue-300 p-3' : 'p-1'
-              }`}
+            <SortableContext
+              items={column.cards.map((card) => "CARD" + card.id)}
+              strategy={verticalListSortingStrategy}
             >
-              {column.cards.map((card) => (
-                <CardItem
-                  listId={column.id}
-                  key={card.id}
-                  card={card}
-                  onOpen={onOpenCard}
-                  onEdit={onEditCard}
-                  onDelete={onDeleteCard}
-                  onDuplicate={onDuplicateCard}
-                  onMove={onMoveCardInColumn}
-                  onChangePriority={onChangePriority}
-                />
-              ))}
+              <div
+                // ref={drop}
+                className={`space-y-3 min-h-[240px] transition-all duration-300 rounded-lg ${
+                  isOver ? 'bg-blue-50/50 border-2 border-dashed border-blue-300 p-3' : 'p-1'
+                }`}
+              >
+                {column.cards.map((card) => (
+                  <SortableWrapper
+                    key={card.id}
+                    id={"CARD" + card.id}
+                    isLock={false}
+                  >
+                    <div data-list-id={column.id} className="cardWrapper">
+                      <CardItem
+                        listId={column.id}
+                        card={card}
+                        onOpen={onOpenCard}
+                        onEdit={onEditCard}
+                        onDelete={onDeleteCard}
+                        onDuplicate={onDuplicateCard}
+                        onMove={onMoveCardInColumn}
+                        onChangePriority={onChangePriority}
+                      />
+                    </div>
+                  </SortableWrapper>
+                ))}
               {column.cards.length === 0 && !isOver && (
                 <div className="text-center text-muted-foreground py-16">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 border border-border/60 flex items-center justify-center">
@@ -394,7 +406,8 @@ function ListItem({
                   </Button>
                 </div>
               )}
-            </div>
+              </div>
+            </SortableContext>
           </CardContent>
         )}
       </Card>

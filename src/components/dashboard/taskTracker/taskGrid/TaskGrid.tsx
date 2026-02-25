@@ -227,7 +227,14 @@ export function TaskGrid() {
                             {
                               taskGridData[dayData.dateString] && Object.entries(taskGridData[dayData.dateString]).map((e:any,i:any)=>{
                                 return (
-                                  <p key={i} className="text-sm">{e} &nbsp;</p>
+                                  <>
+                                  <p key={i} className="text-sm font-semibold">{e[0]}</p>
+                                  <ul className="list-disc list-inside text-sm">
+                                    {e[1].map((item:any,index:any)=>{
+                                      return <li key={index}>{item}</li>
+                                    })}
+                                  </ul>
+                                  </>
                                 )
                               })
                             }

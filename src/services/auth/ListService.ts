@@ -38,8 +38,9 @@ let ListService:any = (function () {
     return res.json();
   };
   ListService.prototype.updateListPosition = async function (params:any) {
-    const res = await fetch(baseUrl + "list/updatePosition", {
-      method: "PUT",
+    console.log(params)
+    const res = await fetch(baseUrl + "list/board/"+params.boardId+"/position", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         authorization: "Bearer " + localStorage.getItem("token"),
